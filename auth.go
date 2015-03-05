@@ -251,7 +251,9 @@ func (a Authorizer) Authorize(rw http.ResponseWriter, req *http.Request) (*UserD
 		user, err := a.backend.User(name)
 		if err == ErrMissingUser {
 			session.Options.MaxAge = -1 // kill the cookie
-			session.Save(req, rw)
+			if rw != nil {
+				session.Save(req, rw)
+			}
 			return nil, mkerror("user not found")
 		} else if err != nil {
 			return nil, mkerror(err.Error())
