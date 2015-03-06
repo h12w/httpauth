@@ -7,8 +7,8 @@ import (
 	"os"
 )
 
-// SqlAuthBackend database and database connection information.
-type SqlAuthBackend struct {
+// SQLAuthBackend database and database connection information.
+type SQLAuthBackend struct {
 	driverName     string
 	dataSourceName string
 	db             *sql.DB
@@ -25,7 +25,7 @@ func mksqlerror(msg string) error {
 	return errors.New("sqlbackend: " + msg)
 }
 
-// NewSqlAuthBackend initializes a new backend by testing the database
+// NewSQLAuthBackend initializes a new backend by testing the database
 // connection and making sure the storage table exists. The table is called
 // goauth.
 //
@@ -39,7 +39,7 @@ func mksqlerror(msg string) error {
 // Be sure to import "database/sql" and your driver of choice. If you're not
 // using sql for your own purposes, you'll need to use the underscore to import
 // for side effects; see http://golang.org/doc/effective_go.html#blank_import.
-func NewSqlAuthBackend(driverName, dataSourceName string) (b SqlAuthBackend, e error) {
+func NewSQLAuthBackend(driverName, dataSourceName string) (b SQLAuthBackend, e error) {
 	b.driverName = driverName
 	b.dataSourceName = dataSourceName
 	if driverName == "sqlite3" {
@@ -118,7 +118,7 @@ func NewSqlAuthBackend(driverName, dataSourceName string) (b SqlAuthBackend, e e
 
 // User returns the user with the given username. Error is set to
 // ErrMissingUser if user is not found.
-func (b SqlAuthBackend) User(username string) (user UserData, e error) {
+func (b SQLAuthBackend) User(username string) (user UserData, e error) {
 	row := b.userStmt.QueryRow(username)
 	err := row.Scan(&user.Email, &user.Hash, &user.Role)
 	if err != nil {
@@ -132,7 +132,7 @@ func (b SqlAuthBackend) User(username string) (user UserData, e error) {
 }
 
 // Users returns a slice of all users.
-func (b SqlAuthBackend) Users() (us []UserData, e error) {
+func (b SQLAuthBackend) Users() (us []UserData, e error) {
 	rows, err := b.usersStmt.Query()
 	if err != nil {
 		return us, mksqlerror(err.Error())
@@ -152,7 +152,7 @@ func (b SqlAuthBackend) Users() (us []UserData, e error) {
 }
 
 // SaveUser adds a new user, replacing one with the same username.
-func (b SqlAuthBackend) SaveUser(user UserData) (err error) {
+func (b SQLAuthBackend) SaveUser(user UserData) (err error) {
 	if _, err := b.User(user.Name); err == nil {
 		_, err = b.updateStmt.Exec(user.Email, user.Hash, user.Role, user.Name)
 	} else {
@@ -162,7 +162,7 @@ func (b SqlAuthBackend) SaveUser(user UserData) (err error) {
 }
 
 // DeleteUser removes a user, raising ErrDeleteNull if that user was missing.
-func (b SqlAuthBackend) DeleteUser(username string) error {
+func (b SQLAuthBackend) DeleteUser(username string) error {
 	result, err := b.deleteStmt.Exec(username)
 	if err != nil {
 		return mksqlerror(err.Error())
@@ -178,7 +178,7 @@ func (b SqlAuthBackend) DeleteUser(username string) error {
 }
 
 // Close cleans up the backend by terminating the database connection.
-func (b SqlAuthBackend) Close() {
+func (b SQLAuthBackend) Close() {
 	b.db.Close()
 	b.userStmt.Close()
 	b.usersStmt.Close()

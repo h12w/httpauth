@@ -28,7 +28,7 @@ func mkmgoerror(msg string) error {
 // Example:
 //     backend = httpauth.MongodbAuthBackend("mongodb://127.0.0.1/", "auth")
 //     defer backend.Close()
-func NewMongodbBackend(mongoURL string, database string) (b MongodbAuthBackend, e error) {
+func NewMongoAuthBackend(mongoURL string, database string) (b MongodbAuthBackend, e error) {
 	// Set up connection to database
 	b.mongoURL = mongoURL
 	b.database = database
