@@ -36,6 +36,10 @@ func NewGobFileAuthBackend(filepath string) (b GobFileAuthBackend, e error) {
 	} else if !os.IsNotExist(err) {
 		return b, fmt.Errorf("gobfilebackend: %v", err.Error())
 	} else {
+		if f, err := os.Create(filepath); err == nil {
+			f.Close()
+			return NewGobFileAuthBackend(filepath)
+		}
 		return b, ErrMissingBackend
 	}
 	if b.users == nil {
